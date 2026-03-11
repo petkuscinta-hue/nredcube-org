@@ -18,15 +18,16 @@
         <div class="paper">
 
         <div class="lang-bar">
-            <button onclick="translateTo('de')" title="Deutsch">🇩🇪</button>
-            <button onclick="translateTo('sk')" title="Slovenčina">🇸🇰</button>
-            <button onclick="translateTo('cs')" title="Čeština">🇨🇿</button>
-            <button onclick="translateTo('fr')" title="Français">🇫🇷</button>
-            <button onclick="translateTo('es')" title="Español">🇪🇸</button>
-            <button onclick="translateTo('it')" title="Italiano">🇮🇹</button>
-            <button onclick="translateTo('ja')" title="日本語">🇯🇵</button>
-            <button onclick="translateTo('zh-CN')" title="中文">🇨🇳</button>
-            <button onclick="translateTo('en')" title="English">🇬🇧</button>
+            <button onclick="translateTo('de')" title="Deutsch">DE</button>
+            <button onclick="translateTo('sk')" title="Slovenčina">SK</button>
+            <button onclick="translateTo('cs')" title="Čeština">CZ</button>
+            <button onclick="translateTo('fr')" title="Français">FR</button>
+            <button onclick="translateTo('es')" title="Español">ES</button>
+            <button onclick="translateTo('it')" title="Italiano">IT</button>
+            <button onclick="translateTo('ja')" title="日本語">JP</button>
+            <button onclick="translateTo('zh-CN')" title="中文">CN</button>
+            <button onclick="translateTo('ru')" title="Русский">RU</button>
+            <button onclick="translateTo('en')" title="English">GB</button>
         </div>
 
         <div class="paper-top">
@@ -37,6 +38,7 @@
             <p class="brand">nREDCube<sup class="brand-tm">™</sup></p>
             <h1>PRINCIPIA</h1>
             <h2>Universal Principles of Status Change Management</h2>
+            <p class="author">Peter Cziel</p>
         </header>
 
         <main>
@@ -73,7 +75,7 @@
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
-                includedLanguages: 'de,sk,cs,fr,es,it,ja,zh-CN',
+                includedLanguages: 'de,sk,cs,fr,es,it,ja,zh-CN,ru',
                 autoDisplay: false
             }, 'google_translate_element');
         }

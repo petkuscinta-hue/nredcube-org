@@ -61,28 +61,36 @@ body {
     z-index: 1;
 }
 
-/* ── Language Flag Bar ── */
+/* ── Language Bar ── */
 .lang-bar {
     display: flex;
     justify-content: center;
-    gap: 6px;
-    padding: 8px 64px;
-    border-bottom: 1px solid rgba(180, 190, 205, 0.4);
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 10px 64px 12px;
+    border-bottom: 1px solid rgba(125, 132, 143, 0.4);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
 }
 
 .lang-bar button {
     background: none;
     border: none;
-    font-size: 1.5rem;
     cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 4px;
-    opacity: 0.75;
-    transition: opacity 0.15s;
+    padding: 0;
+    color: #555;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    transition: color 0.15s, opacity 0.15s;
 }
 
 .lang-bar button:hover {
-    opacity: 1;
+    color: #1a1a1a;
+    text-decoration: underline;
 }
 
 /* Hide Google Translate banner */
@@ -96,8 +104,8 @@ body { top: 0 !important; }
 
 /* ── Copyright Line ── */
 .copyright-top {
-    font-size: 0.8rem;
-    color: #777;
+    font-size: 0.82rem;
+    color: #555;
     text-align: center;
     margin: 0;
     letter-spacing: 0.03em;
@@ -149,6 +157,16 @@ h2 {
     width: 100%;
 }
 
+/* ── Author ── */
+.author {
+    font-family: 'EB Garamond', Garamond, serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: #666;
+    margin-top: 14px;
+    letter-spacing: 0.04em;
+}
+
 /* ── Principles List ── */
 .principles {
     list-style: disc;
@@ -157,7 +175,7 @@ h2 {
 }
 
 .principles li {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     line-height: 1.85;
     margin-bottom: 1em;
     text-align: justify;
@@ -197,8 +215,8 @@ footer {
 }
 
 footer p {
-    font-size: 0.72rem;
-    color: #999;
+    font-size: 0.82rem;
+    color: #555;
     letter-spacing: 0.02em;
 }
 
