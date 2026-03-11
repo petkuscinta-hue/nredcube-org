@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nREDCube™ PRINCIPIA — Universal Principles of Status Change Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ADLaM+Display&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="page-container">
+
+        <div id="google_translate_element" style="display:none"></div>
+
+        <div class="paper">
+
+        <div class="lang-bar">
+            <button onclick="translateTo('de')" title="Deutsch">🇩🇪</button>
+            <button onclick="translateTo('sk')" title="Slovenčina">🇸🇰</button>
+            <button onclick="translateTo('cs')" title="Čeština">🇨🇿</button>
+            <button onclick="translateTo('fr')" title="Français">🇫🇷</button>
+            <button onclick="translateTo('es')" title="Español">🇪🇸</button>
+            <button onclick="translateTo('it')" title="Italiano">🇮🇹</button>
+            <button onclick="translateTo('ja')" title="日本語">🇯🇵</button>
+            <button onclick="translateTo('zh-CN')" title="中文">🇨🇳</button>
+            <button onclick="translateTo('en')" title="English">🇬🇧</button>
+        </div>
+
+        <div class="paper-top">
+            <p class="copyright-top">This document is the property of BoNster Pty. Ltd. ABN25679279. Copyright<sup>®</sup>All rights reserved</p>
+        </div>
+
+        <header>
+            <p class="brand">nREDCube<sup class="brand-tm">™</sup></p>
+            <h1>PRINCIPIA</h1>
+            <h2>Universal Principles of Status Change Management</h2>
+        </header>
+
+        <main>
+            <ul class="principles">
+                <li>Laws of the universe guide everything &mdash; every status change</li>
+                <li><strong>nREDCube<sup>™</sup> PRINCIPIA</strong> is continuously AI-aligned &mdash; because it is based on laws of physics that AI always obeys.</li>
+                <li><strong>nREDCube<sup>™</sup> PRINCIPIA</strong> is continuously human-friendly thanks to slicing time into district cubes &ndash; district time space</li>
+                <li>The status today in 3D Space at time t<sub>1</sub> is always the result of the status yesterday in 3D Space at time t<sub>0</sub> via application of energy through resistance-constraints-leakage-entropy (RCLE).</li>
+                <li>Decisiveness over Subjectivity</li>
+                <li>First Principles over Assumptions</li>
+                <li>Always challenge time constraints (the only reason why a change of status cannot happen instantly is resistance and constraints &mdash; remove them or reduce them).</li>
+                <li>Analog status changes of the universe are turned into digital status cubes (weekly default setting)</li>
+                <li>Completion of the status of the district cubes is non-negotiable (either done or not done, either 0% or 100%, nothing between)</li>
+            </ul>
+        </main>
+
+        <section class="diagrams">
+            <img src="nRedCubeTM Main picture.png" alt="nREDCube™ Principles Diagrams — Universal Principles, Physics, and District Cubes of Status Management">
+        </section>
+
+        <footer>
+            <p id="footer-copy"></p>
+        </footer>
+
+        </div><!-- end .paper -->
+
+    </div>
+
+    <script>
+        document.getElementById('footer-copy').innerHTML =
+            '&copy; ' + new Date().getFullYear() +
+            ' BoNster Pty. Ltd. ABN 25679279. All rights reserved. nREDCube&trade; is a trademark of BoNster Pty. Ltd.';
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'de,sk,cs,fr,es,it,ja,zh-CN',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function translateTo(lang) {
+            var select = document.querySelector('.goog-te-combo');
+            if (select) {
+                select.value = lang;
+                select.dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
