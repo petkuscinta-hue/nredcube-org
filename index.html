@@ -31,7 +31,7 @@
         </div>
 
         <div class="paper-top">
-            <p class="copyright-top">This document is the property of BoNster Pty. Ltd. ABN 80 612 233 306. Copyright<sup>®</sup>All rights reserved</p>
+            <p class="copyright-top" id="copyright-top"></p>
         </div>
 
         <header>
@@ -68,6 +68,10 @@
     </div>
 
     <script>
+        document.getElementById('copyright-top').innerHTML =
+            '&copy; ' + new Date().getFullYear() +
+            ' BoNster Pty. Ltd. ABN 80 612 233 306. All rights reserved.';
+
         document.getElementById('footer-copy').innerHTML =
             '&copy; ' + new Date().getFullYear() +
             ' BoNster Pty. Ltd. ABN 80 612 233 306. All rights reserved. nREDCube&trade; is a trademark of BoNster Pty. Ltd.';
