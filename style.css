@@ -195,6 +195,16 @@ h2 {
     font-size: 0.6em;
 }
 
+.formula {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 1.15em;
+    font-style: italic;
+    color: #c41230;
+    margin-top: 0.5em;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
 /* ── Diagrams ── */
 .diagrams {
     margin-bottom: 52px;
