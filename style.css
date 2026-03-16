@@ -195,6 +195,17 @@ h2 {
     font-size: 0.6em;
 }
 
+.upscm {
+    font-size: 0.65em;
+    color: #3d5a7a;
+    opacity: 0.75;
+    vertical-align: middle;
+}
+
+.upscm sup {
+    font-size: 0.6em;
+}
+
 .formula {
     font-family: 'EB Garamond', Georgia, serif;
     font-size: 1.15em;
