@@ -6,7 +6,9 @@
       "Bash(pip list:*)",
       "Bash(pip install:*)",
       "Bash(python -c \"import openpyxl; print\\(''ready''\\)\")",
-      "Bash(python generate_nred_tables.py)"
+      "Bash(python generate_nred_tables.py)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
