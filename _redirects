@@ -1,0 +1,3 @@
+# Old PRINCIPIA link. Handled server-side: a principia.html file here would
+# collide with the /principia/ folder and cause a redirect loop on Netlify.
+/principia.html   /principia/   301

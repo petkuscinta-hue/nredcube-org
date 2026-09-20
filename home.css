@@ -555,8 +555,8 @@ body.hiw-lock { overflow: hidden; }
 
 .hiw-btn:hover { border-color: var(--red); color: var(--red); }
 .hiw-btn svg { width: 42%; height: 42%; fill: currentColor; }
-.hiw-btn[data-state="playing"] .ic-play  { display: none; }
-.hiw-btn[data-state="paused"]  .ic-pause { display: none; }
+[data-state="playing"] .ic-play  { display: none; }
+[data-state="paused"]  .ic-pause { display: none; }
 
 /* ── popup body ── */
 .hiw-body {
@@ -699,8 +699,9 @@ body.hiw-lock { overflow: hidden; }
 .hiw-cube-arrow { transition: opacity .4s; }
 .hiw-panel[data-stage="4"] .hiw-cube-arrow { opacity: 0; }
 
-.hiw-notes { display: none; gap: clamp(8px, 1.2vw, 20px); }
-.hiw-panel[data-stage="3"] .hiw-notes { display: flex; animation: hiwIn .55s ease-out; }
+/* Kept in flow on every stage so the controls below never shift position. */
+.hiw-notes { display: flex; gap: clamp(8px, 1.2vw, 20px); visibility: hidden; }
+.hiw-panel[data-stage="3"] .hiw-notes { visibility: visible; animation: hiwIn .55s ease-out; }
 
 .hiw-note {
     background: #fff;
@@ -713,6 +714,41 @@ body.hiw-lock { overflow: hidden; }
 .hiw-note b { display: block; font-size: clamp(10px, 1.5vh, 15px); color: var(--ink); }
 .hiw-note-red b { color: var(--red); }
 .hiw-note span { font-size: clamp(9px, 1.35vh, 13.5px); color: var(--muted); }
+
+.hiw-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(8px, 1vw, 16px);
+    margin-top: clamp(18px, 4.6vh, 58px);
+}
+
+.hiw-navbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5em;
+    padding: clamp(5px, .9vh, 10px) clamp(11px, 1.3vw, 22px);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    font-family: inherit;
+    font-size: clamp(9.5px, 1.35vh, 14px);
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color .15s, border-color .15s;
+}
+
+.hiw-navbtn:hover { color: var(--red); border-color: var(--red); }
+
+.hiw-navbtn-icon { padding-inline: clamp(10px, 1.1vw, 16px); }
+
+.hiw-navbtn-icon svg {
+    display: block;
+    width: clamp(9px, 1.3vh, 13px);
+    height: auto;
+    fill: currentColor;
+}
 
 /* ── popup footer ── */
 .hiw-foot {

@@ -404,7 +404,7 @@
 
             <div class="hiw-tools">
                 <p class="hiw-count">How it works <span id="hiwCount">1</span>&thinsp;/&thinsp;4</p>
-                <button type="button" class="hiw-btn" id="hiwToggle" data-state="playing" aria-label="Pause">
+                <button type="button" class="hiw-btn js-hiw-toggle" data-state="playing" aria-label="Pause">
                     <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
                         <path class="ic-pause" d="M4 2h3.2v12H4zM8.8 2H12v12H8.8z"/>
                         <path class="ic-play" d="M4 2l10 6-10 6z"/>
@@ -555,6 +555,22 @@
                     <p class="hiw-note"><b>AI = tool</b><span>speed &bull; pattern finding &bull; analysis</span></p>
                     <p class="hiw-note hiw-note-red"><b>USCMS = methodology</b><span>vision &bull; strategy &bull; governing logic</span></p>
                 </div>
+
+                <div class="hiw-nav">
+                    <button type="button" class="hiw-navbtn" data-step="-1">
+                        <span aria-hidden="true">&larr;</span> Back
+                    </button>
+                    <button type="button" class="hiw-navbtn hiw-navbtn-icon js-hiw-toggle"
+                            data-state="playing" aria-label="Pause">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                            <path class="ic-pause" d="M4 2h3.2v12H4zM8.8 2H12v12H8.8z"/>
+                            <path class="ic-play" d="M4 2l10 6-10 6z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="hiw-navbtn" data-step="1">
+                        Next <span aria-hidden="true">&rarr;</span>
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -580,7 +596,7 @@
         var overlay  = document.getElementById('hiw');
         var panel    = overlay.querySelector('.hiw-panel');
         var countEl  = document.getElementById('hiwCount');
-        var toggleEl = document.getElementById('hiwToggle');
+        var toggleEls = overlay.querySelectorAll('.js-hiw-toggle');
         var closeEl  = document.getElementById('hiwClose');
         var homeEl   = overlay.querySelector('.hiw-home');
         var stages   = overlay.querySelectorAll('.hiw-stage');
@@ -609,8 +625,10 @@
 
         function setPaused(state) {
             paused = state;
-            toggleEl.setAttribute('data-state', state ? 'paused' : 'playing');
-            toggleEl.setAttribute('aria-label', state ? 'Play' : 'Pause');
+            toggleEls.forEach(function (t) {
+                t.setAttribute('data-state', state ? 'paused' : 'playing');
+                t.setAttribute('aria-label', state ? 'Play' : 'Pause');
+            });
             if (state) stop(); else restart();
         }
 
@@ -658,9 +676,14 @@
         overlay.querySelectorAll('[data-goto]').forEach(function (b) {
             b.addEventListener('click', function () { go(Number(b.dataset.goto)); });
         });
+        overlay.querySelectorAll('[data-step]').forEach(function (b) {
+            b.addEventListener('click', function () { go(current + Number(b.dataset.step)); });
+        });
         closeEl.addEventListener('click', close);
         homeEl.addEventListener('click', close);
-        toggleEl.addEventListener('click', function () { setPaused(!paused); });
+        toggleEls.forEach(function (t) {
+            t.addEventListener('click', function () { setPaused(!paused); });
+        });
         overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
     })();
 </script>

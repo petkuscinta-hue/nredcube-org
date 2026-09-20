@@ -150,7 +150,7 @@
             var input = document.getElementById('pw').value;
             if (input === 'Domasa477') {
                 sessionStorage.setItem('nrc_access', '1');
-                window.location.href = 'document.html';
+                window.location.href = '/principia/document.html';
             } else {
                 document.getElementById('error-msg').textContent = 'Incorrect access code.';
                 document.getElementById('pw').value = '';
@@ -164,7 +164,7 @@
 
         // If already authenticated this session, go straight through
         if (sessionStorage.getItem('nrc_access') === '1') {
-            window.location.href = 'document.html';
+            window.location.href = '/principia/document.html';
         }
     </script>
 
