@@ -741,14 +741,6 @@ body.hiw-lock { overflow: hidden; }
 
 .hiw-navbtn:hover { color: var(--red); border-color: var(--red); }
 
-.hiw-navbtn-icon { padding-inline: clamp(10px, 1.1vw, 16px); }
-
-.hiw-navbtn-icon svg {
-    display: block;
-    width: clamp(9px, 1.3vh, 13px);
-    height: auto;
-    fill: currentColor;
-}
 
 /* ── popup footer ── */
 .hiw-foot {
