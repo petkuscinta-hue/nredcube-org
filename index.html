@@ -31,7 +31,8 @@
 
             <nav class="site-nav" aria-label="Primary">
                 <button type="button" class="nav-link js-hiw" data-screen="how-it-works">How it works</button>
-                <a class="nav-link" href="/principia/">Principles</a>
+                <button type="button" class="nav-link js-sim" data-screen="simulation">Simulation</button>
+                <a class="nav-link js-prin" href="/principia/">Principles</a>
                 <!-- Reserved for a future Use cases screen; hidden from view and from the tab order. -->
                 <a class="nav-link" data-screen="use-cases" href="#systems" hidden>Use cases</a>
                 <a class="nav-link" href="mailto:peter.cziel@nredgroup.com.au?subject=nREDCube%20enquiry">Contact</a>
@@ -589,6 +590,76 @@
     </div>
 </div>
 
+<!-- ══ Simulation — same scope, different resistance ═════════════ -->
+<div class="sim-overlay" id="simulation" aria-hidden="true">
+    <div class="sim-panel" role="dialog" aria-modal="true" aria-label="nREDCube project flow simulation">
+
+        <header class="hiw-head">
+            <button type="button" class="hiw-home sim-home" aria-label="Close simulation and return to the home page">
+                <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                    <path d="M16 2 29 9.5 16 17 3 9.5Z" fill="#e8394e"/>
+                    <path d="M3 9.5 16 17v13L3 22.5Z" fill="#cf1731"/>
+                    <path d="M29 9.5 16 17v13l13-7.5Z" fill="#9d1223"/>
+                </svg>
+                <span class="logo-text">n<span class="logo-accent">RED</span>Cube<sup class="tm">&trade;</sup></span>
+            </button>
+
+            <div class="hiw-tools">
+                <p class="hiw-count">Simulation</p>
+                <button type="button" class="hiw-btn" id="simClose" aria-label="Close">
+                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M3.4 2.3 8 6.9l4.6-4.6 1.1 1.1L9.1 8l4.6 4.6-1.1 1.1L8 9.1l-4.6 4.6-1.1-1.1L6.9 8 2.3 3.4z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="sim-body">
+            <div class="sim-stage-scroll">
+                <canvas id="simCanvas" class="sim-stage" width="855" height="775" role="img"
+                    aria-label="Two animated weekly grids. Conventional delivery fills all 52 weeks. nREDCube flow reaches the same outcome in 32 weeks because the surplus effort burns off before it lands."></canvas>
+            </div>
+        </div>
+
+        <footer class="sim-foot">
+            <p><strong>Same required physical scope.</strong> Different resistance to progress. Different time to Status B.</p>
+            <button type="button" class="sim-replay" id="simReplay">Replay</button>
+        </footer>
+
+    </div>
+</div>
+
+<!-- ══ PRINCIPIA — the canonical document, shown in a popup ══════ -->
+<div class="prin-overlay" id="principia" aria-hidden="true">
+    <div class="prin-panel" role="dialog" aria-modal="true" aria-label="nREDCube PRINCIPIA">
+
+        <header class="hiw-head">
+            <button type="button" class="hiw-home prin-home" aria-label="Close and return to the home page">
+                <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                    <path d="M16 2 29 9.5 16 17 3 9.5Z" fill="#e8394e"/>
+                    <path d="M3 9.5 16 17v13L3 22.5Z" fill="#cf1731"/>
+                    <path d="M29 9.5 16 17v13l13-7.5Z" fill="#9d1223"/>
+                </svg>
+                <span class="logo-text">n<span class="logo-accent">RED</span>Cube<sup class="tm">&trade;</sup></span>
+            </button>
+
+            <div class="hiw-tools">
+                <p class="hiw-count">Principles</p>
+                <button type="button" class="hiw-btn" id="prinClose" aria-label="Close">
+                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                        <path d="M3.4 2.3 8 6.9l4.6-4.6 1.1 1.1L9.1 8l4.6 4.6-1.1 1.1L8 9.1l-4.6 4.6-1.1-1.1L6.9 8 2.3 3.4z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="prin-body">
+            <iframe id="prinFrame" class="prin-frame" title="nREDCube PRINCIPIA"></iframe>
+        </div>
+
+    </div>
+</div>
+
 <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -684,6 +755,510 @@
         toggleEls.forEach(function (t) {
             t.addEventListener('click', function () { setPaused(!paused); });
         });
+        overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
+    })();
+
+
+    (function () {
+        var overlay = document.getElementById('simulation');
+        var panel = overlay.querySelector('.sim-panel');
+        var canvas = document.getElementById('simCanvas');
+        var closeEl = document.getElementById('simClose');
+        var homeEl = overlay.querySelector('.sim-home');
+        var replayEl = document.getElementById('simReplay');
+        var screenEl = document.querySelector('.screen');
+        var opener = null;
+        var frame = 0;
+
+        var COLS = 20;
+        var ROWS = 52;
+        var SCOPE_ROWS = 32;
+        var CELL = 10;
+        var CUBE = 8.4;
+        var GRID_TOP = 88;
+        var GRID_BOTTOM = GRID_TOP + ROWS * CELL;
+        var LEFT_X = 80;
+        var RIGHT_X = 440;
+        var WIDTH = 684;
+        var HEIGHT = 620;
+        var SCENE_SCALE = 1.25;
+        var DISPLAY_WIDTH = WIDTH * SCENE_SCALE;
+        var DISPLAY_HEIGHT = HEIGHT * SCENE_SCALE;
+        /* Conventional delivery fills every week. nREDCube reaches the same
+           outcome in SCOPE_ROWS weeks: the surplus burns off mid-fall. */
+        var TOTAL_CUBES = COLS * ROWS;
+        var KEPT_CUBES = COLS * SCOPE_ROWS;
+        var WASTE_CUBES = TOTAL_CUBES - KEPT_CUBES;
+
+        /* Single pacing knob. Raise to slow the whole simulation down. */
+        var TIME_SCALE = 1.5;
+        var LEFT_END_SECONDS = 15 * TIME_SCALE;
+        /* Derived, so the 52:32 ratio can never drift out of step. */
+        var RIGHT_END_SECONDS = LEFT_END_SECONDS * (SCOPE_ROWS / ROWS);
+        var LANDING_CUE_SECONDS = 0.22;
+        var BURST_SECONDS = 0.5 * TIME_SCALE;
+        var BURST_PARTICLES = 10;
+        /* Burn the surplus off inside the grid, in the band the conventional
+           side is still filling — between week 32 and week 52. */
+        var BURST_Y_TOP = GRID_TOP + CELL;
+        var BURST_Y_BOTTOM = GRID_BOTTOM - (SCOPE_ROWS + 1) * CELL;
+        var FALL_SPEED_RATIO = 0.5;
+        var FALL_DURATION_SCALE = (SCENE_SCALE / FALL_SPEED_RATIO) * TIME_SCALE;
+        var BASE_FALL_SECONDS = 0.52;
+        var FALL_VARIANCE_SECONDS = 0.42;
+        var MAX_FALL_SECONDS = (BASE_FALL_SECONDS + FALL_VARIANCE_SECONDS) * FALL_DURATION_SCALE;
+        var FIRST_BIRTH_SECONDS = 0.04;
+        var MARKERS = [52, 48, 40, 32, 24, 16, 8, 1];
+        /* The payoff, revealed line by line once the right grid tops out. */
+        var CLAIM_START = RIGHT_END_SECONDS + 0.9 * TIME_SCALE;
+        var CLAIM_STEP = 0.42 * TIME_SCALE;
+        var CLAIM_BIG_LINE = 21;
+        var CLAIM_SMALL_LINE = 17;
+        var CLAIM_GAP = 13;
+        var CLAIMS = [
+            { text: 'LOWER COST', big: true },
+            { text: 'LOWER STRESS', big: true },
+            { text: 'LOWER RISK', big: true },
+            { text: 'FASTER DELIVERY', big: true },
+            { text: 'SAME OR BETTER', big: true, gapBefore: true },
+            { text: 'Safety Record', big: false },
+            { text: 'Quality', big: false }
+        ];
+        var palette = ['#69757a', '#7c888d', '#909a9e', '#a4adb0', '#b8c0c2'];
+        var leftCubes = createLeftTimeline();
+        var rightCubes = createRightTimeline();
+        var background = null;
+
+        function seeded(seed) {
+            var value = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+            return value - Math.floor(value);
+        }
+
+        function noise(seed) {
+            var value = Math.sin(seed * 91.733 + 17.19) * 43758.5453;
+            return value - Math.floor(value);
+        }
+
+        function fallDuration(id) {
+            return (BASE_FALL_SECONDS + seeded(id + 3) * FALL_VARIANCE_SECONDS) * FALL_DURATION_SCALE;
+        }
+
+        function makeLandingCube(id, row, col, landAt) {
+            var duration = fallDuration(id);
+            return {
+                id: id,
+                row: row,
+                targetRow: row,
+                col: col,
+                bornAt: landAt - duration,
+                landAt: landAt,
+                spawnY: -12 - seeded(id + 31) * 50,
+                color: Math.floor(seeded(id + 67) * 5)
+            };
+        }
+
+        /* When does this cube's fall carry it past height y? Inverts the
+           easeIn curve used by cubePosition. */
+        function timeAtHeight(cube, y) {
+            var targetY = GRID_BOTTOM - (cube.targetRow + 1) * CELL + (CELL - CUBE) / 2;
+            var span = targetY - cube.spawnY;
+            if (span <= 0) return cube.landAt;
+            var reached = Math.max(0, Math.min(1, (y - cube.spawnY) / span));
+            return cube.bornAt + Math.pow(reached, 1 / 3) * (cube.landAt - cube.bornAt);
+        }
+
+        function landingSchedule(index, endSeconds) {
+            var firstLanding = MAX_FALL_SECONDS + FIRST_BIRTH_SECONDS;
+            var lastLanding = endSeconds - LANDING_CUE_SECONDS;
+            return firstLanding + (index / (TOTAL_CUBES - 1)) * (lastLanding - firstLanding);
+        }
+
+        /* Every week gets filled — no gaps. */
+        function createLeftTimeline() {
+            var cubes = [];
+            for (var row = 0; row < ROWS; row += 1) {
+                for (var offset = 0; offset < COLS; offset += 1) {
+                    var id = row * COLS + offset;
+                    var col = (offset * 7 + row * 3) % COLS;
+                    cubes.push(makeLandingCube(id, row, col, landingSchedule(id, LEFT_END_SECONDS)));
+                }
+            }
+            return cubes;
+        }
+
+        /* The same stream arrives, but WASTE_CUBES of them burn off before
+           landing, so the stack tops out at SCOPE_ROWS instead of ROWS. */
+        function createRightTimeline() {
+            var cubes = [];
+            var kept = 0;
+            for (var id = 0; id < TOTAL_CUBES; id += 1) {
+                var row = Math.floor(kept / COLS);
+                var offset = kept % COLS;
+                var col = (offset * 7 + row * 3) % COLS;
+                var cube = makeLandingCube(id, row, col, landingSchedule(id, RIGHT_END_SECONDS));
+                /* Spread the waste evenly through the stream rather than
+                   bunching it, so the burn-off reads as continuous. */
+                if (((id * WASTE_CUBES) % TOTAL_CUBES) < WASTE_CUBES) {
+                    cube.doomed = true;
+                    cube.dieAt = timeAtHeight(cube,
+                        BURST_Y_TOP + seeded(id + 11) * (BURST_Y_BOTTOM - BURST_Y_TOP));
+                } else {
+                    kept += 1;
+                }
+                cubes.push(cube);
+            }
+            return cubes;
+        }
+
+        function roundedSquare(context, x, y, size, radius) {
+            var r = Math.min(radius, size / 2);
+            context.beginPath();
+            context.moveTo(x + r, y);
+            context.lineTo(x + size - r, y);
+            context.quadraticCurveTo(x + size, y, x + size, y + r);
+            context.lineTo(x + size, y + size - r);
+            context.quadraticCurveTo(x + size, y + size, x + size - r, y + size);
+            context.lineTo(x + r, y + size);
+            context.quadraticCurveTo(x, y + size, x, y + size - r);
+            context.lineTo(x, y + r);
+            context.quadraticCurveTo(x, y, x + r, y);
+            context.closePath();
+            context.fill();
+        }
+
+        function drawStatic(context) {
+            context.clearRect(0, 0, WIDTH, HEIGHT);
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, WIDTH, HEIGHT);
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillStyle = '#34454b';
+            context.font = '700 14px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            context.fillText('CONVENTIONAL DELIVERY', LEFT_X + (COLS * CELL) / 2, 24);
+
+            /* Canvas has no rich text, so the trademark is drawn as its own
+               run, raised and smaller. */
+            var titleFont = '700 14px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            var tmFont = '700 9px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            context.font = titleFont;
+            var brandWidth = context.measureText('nREDCube').width;
+            var tailWidth = context.measureText(' FLOW').width;
+            context.font = tmFont;
+            var tmWidth = context.measureText('™').width;
+            var runStart = RIGHT_X + (COLS * CELL) / 2 - (brandWidth + tmWidth + tailWidth) / 2;
+            context.textAlign = 'left';
+            context.font = titleFont;
+            context.fillText('nREDCube', runStart, 24);
+            context.font = tmFont;
+            context.fillText('™', runStart + brandWidth, 19);
+            context.font = titleFont;
+            context.fillText(' FLOW', runStart + brandWidth + tmWidth, 24);
+            context.textAlign = 'center';
+            context.font = '600 12px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            context.fillStyle = '#728188';
+            context.fillText('same physical scope • 52 weeks', LEFT_X + (COLS * CELL) / 2, 45);
+            context.fillText('same physical scope • 32 weeks', RIGHT_X + (COLS * CELL) / 2, 45);
+
+            [LEFT_X, RIGHT_X].forEach(function (gridX) {
+                context.fillStyle = '#f4f7f8';
+                for (var row = 0; row < ROWS; row += 1) {
+                    for (var col = 0; col < COLS; col += 1) {
+                        context.fillRect(gridX + col * CELL + 0.8, GRID_BOTTOM - (row + 1) * CELL + 0.8, CUBE, CUBE);
+                    }
+                }
+
+                context.strokeStyle = '#dbe5e8';
+                context.lineWidth = 1;
+                context.strokeRect(gridX + 0.5, GRID_TOP + 0.5, COLS * CELL - 1, ROWS * CELL - 1);
+                context.font = '600 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+                context.fillStyle = '#728188';
+                context.textAlign = 'right';
+                context.textBaseline = 'middle';
+                MARKERS.forEach(function (week) {
+                    var y = GRID_BOTTOM - (week - 0.5) * CELL;
+                    context.fillText('week ' + week, gridX - 13, y);
+                    context.strokeStyle = week === 32 ? '#9aaeb3' : '#ccd8db';
+                    context.beginPath();
+                    context.moveTo(gridX - 9, y + 0.5);
+                    context.lineTo(gridX - 3, y + 0.5);
+                    context.stroke();
+                });
+            });
+        }
+
+        function clamp01(value) { return Math.max(0, Math.min(1, value)); }
+        function easeIn(value) { return value * value * value; }
+
+        function cubePosition(cube, elapsed, gridX) {
+            var targetX = gridX + cube.col * CELL + (CELL - CUBE) / 2;
+            var targetY = GRID_BOTTOM - (cube.targetRow + 1) * CELL + (CELL - CUBE) / 2;
+            if (elapsed >= cube.landAt) return { x: targetX, y: targetY, angle: 0 };
+            var progress = clamp01((elapsed - cube.bornAt) / (cube.landAt - cube.bornAt));
+            var drift = (noise(cube.id + 81) - 0.5) * 6;
+            return {
+                x: targetX + drift * (1 - progress),
+                y: cube.spawnY + (targetY - cube.spawnY) * easeIn(progress),
+                angle: (noise(cube.id + 19) - 0.5) * 0.7 * (1 - progress)
+            };
+        }
+
+        /* A doomed cube tears apart in mid-air: the surplus effort that
+           nREDCube never has to spend. */
+        function drawBurst(context, cube, elapsed, gridX) {
+            var origin = cubePosition(cube, cube.dieAt, gridX);
+            var progress = (elapsed - cube.dieAt) / BURST_SECONDS;
+            var centreX = origin.x + CUBE / 2;
+            var centreY = origin.y + CUBE / 2;
+            context.save();
+
+            /* Shockwave — short and bright, this is the moment of destruction. */
+            if (progress < 0.5) {
+                var ring = progress / 0.5;
+                context.globalAlpha = (1 - ring) * 0.9;
+                context.strokeStyle = '#c41230';
+                context.lineWidth = 2.4 * (1 - ring) + 0.6;
+                context.beginPath();
+                context.arc(centreX, centreY, 2 + ring * 16, 0, Math.PI * 2);
+                context.stroke();
+            }
+
+            var size = CUBE * 0.42 * (1 - progress);
+            if (size > 0) {
+                context.globalAlpha = (1 - progress) * (1 - progress);
+                context.fillStyle = '#c41230';
+                for (var p = 0; p < BURST_PARTICLES; p += 1) {
+                    var angle = (p / BURST_PARTICLES) * Math.PI * 2 + seeded(cube.id + p) * 0.9;
+                    var distance = progress * (11 + seeded(cube.id + p * 3) * 15);
+                    context.beginPath();
+                    context.arc(centreX + Math.cos(angle) * distance,
+                                centreY + Math.sin(angle) * distance + progress * 5,
+                                size, 0, Math.PI * 2);
+                    context.fill();
+                }
+            }
+            context.restore();
+        }
+
+        function drawCube(context, cube, elapsed, gridX) {
+            if (elapsed < cube.bornAt) return;
+            if (cube.doomed) {
+                if (elapsed >= cube.dieAt + BURST_SECONDS) return;
+                if (elapsed >= cube.dieAt) { drawBurst(context, cube, elapsed, gridX); return; }
+            }
+            /* Settled cubes are the bulk of every frame — skip the transform. */
+            if (elapsed >= cube.landAt + 0.22) {
+                var restX = gridX + cube.col * CELL + (CELL - CUBE) / 2;
+                var restY = GRID_BOTTOM - (cube.targetRow + 1) * CELL + (CELL - CUBE) / 2;
+                context.fillStyle = palette[cube.color % palette.length];
+                roundedSquare(context, restX, restY, CUBE, 1.7);
+                context.fillStyle = 'rgba(255, 255, 255, 0.24)';
+                context.fillRect(restX + 1.3, restY + 1.1, CUBE - 2.6, 1);
+                return;
+            }
+            var position = cubePosition(cube, elapsed, gridX);
+            var x = position.x;
+            var y = position.y;
+            var scaleX = 1;
+            var scaleY = 1;
+            if (elapsed >= cube.landAt) {
+                var landingAge = elapsed - cube.landAt;
+                if (landingAge < 0.22) {
+                    var progress = landingAge / 0.22;
+                    var bounce = Math.sin(progress * Math.PI * 2.5) * (1 - progress);
+                    scaleX += bounce * 0.15;
+                    scaleY -= bounce * 0.2;
+                    y -= Math.max(0, bounce) * 1.8;
+                }
+            }
+            context.save();
+            context.translate(x + CUBE / 2, y + CUBE / 2);
+            context.rotate(position.angle);
+            context.scale(scaleX, scaleY);
+            /* Doomed cubes flare red just before they go, so the burst reads
+               as a consequence rather than a surprise. */
+            context.fillStyle = (cube.doomed && elapsed > cube.dieAt - 0.3 * TIME_SCALE)
+                ? '#c41230'
+                : palette[cube.color % palette.length];
+            roundedSquare(context, -CUBE / 2, -CUBE / 2, CUBE, 1.7);
+            context.fillStyle = 'rgba(255, 255, 255, 0.24)';
+            context.fillRect(-CUBE / 2 + 1.3, -CUBE / 2 + 1.1, CUBE - 2.6, 1);
+            context.restore();
+        }
+
+        /* Centred in the band the conventional side is still burning through. */
+        function drawClaims(context, elapsed) {
+            if (elapsed < CLAIM_START) return;
+            var height = 0;
+            CLAIMS.forEach(function (claim) {
+                height += (claim.gapBefore ? CLAIM_GAP : 0) +
+                    (claim.big ? CLAIM_BIG_LINE : CLAIM_SMALL_LINE);
+            });
+            var y = (GRID_TOP + (GRID_BOTTOM - SCOPE_ROWS * CELL)) / 2 - height / 2;
+            var centreX = RIGHT_X + (COLS * CELL) / 2;
+
+            context.save();
+            context.textAlign = 'center';
+            context.textBaseline = 'top';
+            CLAIMS.forEach(function (claim, index) {
+                if (claim.gapBefore) y += CLAIM_GAP;
+                var appearAt = CLAIM_START + index * CLAIM_STEP;
+                if (elapsed >= appearAt) {
+                    var entry = Math.min(1, (elapsed - appearAt) / (0.3 * TIME_SCALE));
+                    context.globalAlpha = entry;
+                    context.fillStyle = claim.big ? '#16a34a' : '#137a3a';
+                    context.font = claim.big
+                        ? '800 17px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+                        : '700 14px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+                    context.fillText(claim.text, centreX, y + (1 - entry) * 6);
+                }
+                y += claim.big ? CLAIM_BIG_LINE : CLAIM_SMALL_LINE;
+            });
+            context.restore();
+        }
+
+        function renderScene(context, elapsed) {
+            context.clearRect(0, 0, WIDTH, HEIGHT);
+            context.drawImage(background, 0, 0, WIDTH, HEIGHT);
+            leftCubes.forEach(function (cube) { drawCube(context, cube, elapsed, LEFT_X); });
+            rightCubes.forEach(function (cube) { drawCube(context, cube, elapsed, RIGHT_X); });
+            drawClaims(context, elapsed);
+        }
+
+        function prepareCanvas() {
+            var ratio = Math.min(window.devicePixelRatio || 1, 2);
+            canvas.width = Math.round(DISPLAY_WIDTH * ratio);
+            canvas.height = Math.round(DISPLAY_HEIGHT * ratio);
+            canvas.style.aspectRatio = DISPLAY_WIDTH + ' / ' + DISPLAY_HEIGHT;
+            var context = canvas.getContext('2d');
+            context.setTransform(ratio * SCENE_SCALE, 0, 0, ratio * SCENE_SCALE, 0, 0);
+
+            background = document.createElement('canvas');
+            background.width = canvas.width;
+            background.height = canvas.height;
+            var backgroundContext = background.getContext('2d');
+            backgroundContext.setTransform(ratio * SCENE_SCALE, 0, 0, ratio * SCENE_SCALE, 0, 0);
+            drawStatic(backgroundContext);
+            return context;
+        }
+
+        function play() {
+            if (frame) cancelAnimationFrame(frame);
+            var context = prepareCanvas();
+            var epoch = performance.now();
+            function animate(now) {
+                var elapsed = Math.min((now - epoch) / 1000, LEFT_END_SECONDS);
+                canvas.dataset.elapsed = elapsed.toFixed(3);
+                canvas.dataset.rightState = elapsed < RIGHT_END_SECONDS ? 'active' : 'held';
+                renderScene(context, elapsed);
+                if (elapsed < LEFT_END_SECONDS) frame = requestAnimationFrame(animate);
+            }
+            frame = requestAnimationFrame(animate);
+        }
+
+        function open() {
+            opener = document.activeElement;
+            overlay.classList.add('is-open');
+            overlay.removeAttribute('aria-hidden');
+            if (screenEl) screenEl.setAttribute('inert', '');
+            document.body.classList.add('sim-lock');
+            play();
+            closeEl.focus();
+            document.addEventListener('keydown', onKey);
+        }
+
+        function close() {
+            if (frame) cancelAnimationFrame(frame);
+            frame = 0;
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+            if (screenEl) screenEl.removeAttribute('inert');
+            document.body.classList.remove('sim-lock');
+            document.removeEventListener('keydown', onKey);
+            if (opener && opener.focus) opener.focus();
+        }
+
+        function trap(e) {
+            var focusable = panel.querySelectorAll('button');
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+
+        function onKey(e) {
+            if (e.key === 'Escape') close();
+            else if (e.key === 'Tab') trap(e);
+        }
+
+        document.querySelectorAll('.js-sim').forEach(function (trigger) {
+            trigger.addEventListener('click', function (e) { e.preventDefault(); open(); });
+        });
+        closeEl.addEventListener('click', close);
+        homeEl.addEventListener('click', close);
+        replayEl.addEventListener('click', play);
+        overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
+    })();
+
+
+    (function () {
+        var overlay = document.getElementById('principia');
+        var panel = overlay.querySelector('.prin-panel');
+        var frame = document.getElementById('prinFrame');
+        var closeEl = document.getElementById('prinClose');
+        var homeEl = overlay.querySelector('.prin-home');
+        var screenEl = document.querySelector('.screen');
+        var opener = null;
+
+        function open() {
+            opener = document.activeElement;
+            /* Loaded on first use so the homepage never pays for it. */
+            if (!frame.getAttribute('src')) frame.setAttribute('src', '/principia/');
+            overlay.classList.add('is-open');
+            overlay.removeAttribute('aria-hidden');
+            if (screenEl) screenEl.setAttribute('inert', '');
+            document.body.classList.add('prin-lock');
+            closeEl.focus();
+            document.addEventListener('keydown', onKey);
+        }
+
+        function close() {
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+            if (screenEl) screenEl.removeAttribute('inert');
+            document.body.classList.remove('prin-lock');
+            document.removeEventListener('keydown', onKey);
+            if (opener && opener.focus) opener.focus();
+        }
+
+        function trap(e) {
+            var focusable = panel.querySelectorAll('button, iframe');
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+
+        function onKey(e) {
+            if (e.key === 'Escape') close();
+            else if (e.key === 'Tab') trap(e);
+        }
+
+        /* Escape has to work while reading the document too, and key events
+           inside an iframe never reach this document. */
+        frame.addEventListener('load', function () {
+            try { frame.contentDocument.addEventListener('keydown', onKey); } catch (err) {}
+        });
+
+        document.querySelectorAll('.js-prin').forEach(function (trigger) {
+            trigger.addEventListener('click', function (e) {
+                /* Leave modified clicks alone so the full page still opens in a new tab. */
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                e.preventDefault();
+                open();
+            });
+        });
+        closeEl.addEventListener('click', close);
+        homeEl.addEventListener('click', close);
         overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
     })();
 </script>
